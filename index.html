@@ -1,388 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Esports Scoreboard Calculator</title>
-  <link rel="icon" href="https://png.pngtree.com/png-clipart/20230508/original/pngtree-vector-esports-gaming-logo-png-image_9150467.png" type="image/png">
-  <style>
-    :root {
-      --bg: #0f1220;
-      --card: #171a2b;
-      --muted: #8b94a7;
-      --accent: #4f46e5;
-      --text: #f8fafc;
-    }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-    h1 {
-      margin-bottom: 30px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 1000px;
-      margin-top: 20px;
-      background: var(--card);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #2c2f48;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #1f2235;
-    }
-    input[type="number"], input[type="text"] {
-      width: 180px;
-      padding: 4px;
-      border-radius: 6px;
-      border: none;
-      text-align: center;
-    }
-    .controls {
-      margin: 20px 0;
-    }
-    button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      margin: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-    .img-preview {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Esports Scoreboard Calculator</title>
+<link rel="icon" href="https://png.pngtree.com/png-clipart/20230508/original/pngtree-vector-esports-gaming-logo-png-image_9150467.png" type="image/png">
+<style>
+:root {
+  --bg: #0f1220;
+  --card: #171a2b;
+  --muted: #8b94a7;
+  --accent: #4f46e5;
+  --text: #f8fafc;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: Montserrat, system-ui, -apple-system, "Segoe UI", Roboto; }
+body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+h1 { margin-bottom: 20px; }
+.controls { margin: 20px 0; }
+input[type="number"], input[type="text"], textarea { width: 180px; padding: 4px; border-radius: 6px; border: none; text-align: center; }
+textarea { width: 300px; }
+button {
+  background: var(--accent); color: white; border: none; padding: 10px 16px;
+  margin: 5px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+button:hover { opacity: 0.9; }
+table { border-collapse: collapse; width: 100%; max-width: 1000px; margin-top: 20px; background: var(--card); border-radius: 12px; overflow: hidden; }
+th, td { border: 1px solid #2c2f48; padding: 8px; text-align: center; }
+th { background: #1f2235; }
+.img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+#teamCounter { font-weight: bold; margin-left: 10px; }
+</style>
 </head>
 <body>
-  <h1>Esports Scoreboard Calculator</h1>
+<h1>Esports Scoreboard Calculator</h1>
 
-  <div class="controls">
-    <!-- ✅ Add scoreboard title input -->
-   <label>Scoreboard Title :&nbsp; 
-      <input type="text" id="scoreboardTitle" placeholder="Tournament Name">
-   </label>
-    <br><br>
-   <label>Subtitle (optional): 
-      <input type="text" id="scoreboardSubtitle" placeholder="Enter subtitle (optional)">
-   </label>
-    <br><br>
-   <label>Match number :&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="text" id="scoreboardSubtitle2" placeholder="Match no(optional)">
-   </label>
-    <br><br>
-    <label>Points per Kill :&nbsp;&nbsp;&nbsp; <input type="number" id="pointsPerKill" value="2"></label>
-    <button onclick="addRow()">Add Team</button>
-    <button id="generateReadOnly">Generate Read-Only Page</button>
-    <button id="resetBtn">Reset</button>
-    <br><br>
-    <!-- ✅ Default Image Upload Button -->
-    <label>Default Team Image: 
-      <input type="file" id="defaultImageInput" accept="image/*">
-    </label>
-  </div>
+<div class="controls">
+  <label>Scoreboard Title : <textarea id="scoreboardTitle" placeholder="Overall standings" rows="2"></textarea></label><br><br>
+  <label>Subtitle (optional): <input type="text" id="scoreboardSubtitle" placeholder="Enter subtitle (optional)"></label><br><br>
+  <label>Match number : <input type="text" id="scoreboardSubtitle2" placeholder="Match no (optional)"></label><br><br>
+  <label>Points per Kill : <input type="number" id="pointsPerKill" value="2"></label><br><br>
+  <button onclick="addRow()">+ Team</button>
+  <button onclick="removeRow()">- Team</button>
+  <span id="teamCounter">0</span>
+  <button id="generateReadOnly">Generate Read-Only Page</button>
+  <button id="resetBtn">Reset</button><br><br>
+  <label>Default Team Image: <input type="file" id="defaultImageInput" accept="image/*"></label>
+</div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Team Name</th>
-        <th>Wins</th>
-        <th>Kills</th>
-        <th>Placement</th>
-        <th>Total</th>
-        <th>Upload</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Team Name</th>
+      <th>Wins</th>
+      <th>Kills</th>
+      <th>Placement</th>
+      <th>Total</th>
+      <th>Upload</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    const tbody = document.querySelector("tbody");
-    const pointsPerKill = document.getElementById("pointsPerKill");
+<script>
+const tbody = document.querySelector("tbody");
+const pointsPerKill = document.getElementById("pointsPerKill");
+const teamCounter = document.getElementById("teamCounter");
+let defaultTeamImage = "";
 
-    // ✅ Store default image
-    let defaultTeamImage = "";
-    document.getElementById("defaultImageInput").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          defaultTeamImage = evt.target.result;
-          alert("Default image uploaded successfully!");
-        };
-        reader.readAsDataURL(file);
+// Escape HTML
+function escapeHtml(s){
+  return (s+"").replace(/&/g,"&amp;")
+                .replace(/</g,"&lt;")
+                .replace(/>/g,"&gt;")
+                .replace(/"/g,"&quot;")
+                .replace(/'/g,"&#39;");
+}
+
+// Default Image Upload
+document.getElementById("defaultImageInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = evt => { defaultTeamImage = evt.target.result; alert("Default image uploaded!"); }
+    reader.readAsDataURL(file);
+  }
+});
+
+function updateTeamCount() { teamCounter.textContent = tbody.rows.length; }
+
+function addRow() {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${defaultTeamImage ? `<img class="img-preview" src="${defaultTeamImage}" />` : ""}</td>
+    <td><input type="text" class="team-name" placeholder="Team"></td>
+    <td><input type="number" class="wins" value="0"></td>
+    <td><input type="number" class="kills" value="0"></td>
+    <td><input type="number" class="place" value="0"></td>
+    <td class="total">0</td>
+    <td><input type="file" accept="image/*" onchange="previewImage(this)"></td>
+  `;
+  tbody.appendChild(tr);
+  tr.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updateTotals));
+  updateTotals();
+  updateTeamCount();
+}
+
+function removeRow() { if(tbody.rows.length>0) tbody.removeChild(tbody.lastElementChild); updateTeamCount(); }
+
+function previewImage(input){
+  const file = input.files[0];
+  const imgCell = input.closest("tr").querySelector("td:first-child");
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => {
+      if(imgCell.querySelector("img")) {
+        imgCell.querySelector("img").src = e.target.result;
+      } else {
+        imgCell.innerHTML = `<img class="img-preview" src="${e.target.result}" />`;
       }
-    });
-
-    function addRow() {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><img class="img-preview" /></td>
-        <td><input type="text" class="team-name" placeholder="Team"></td>
-        <td><input type="number" class="wins" value="0"></td>
-        <td><input type="number" class="kills" value="0"></td>
-        <td><input type="number" class="place" value="0"></td>
-        <td class="total">0</td>
-        <td><input type="file" accept="image/*" onchange="previewImage(this)"></td>
-      `;
-      tbody.appendChild(tr);
-      updateTotals();
-      tr.querySelectorAll("input").forEach(inp => inp.addEventListener("input", updateTotals));
     }
+    reader.readAsDataURL(file);
+  }
+}
 
-    function previewImage(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        input.closest("tr").querySelector(".img-preview").src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function updateTotals() {
+function updateTotals(){
   [...tbody.rows].forEach(tr => {
-    const wins = parseInt(tr.querySelector(".wins").value) || 0;
-    const kills = parseInt(tr.querySelector(".kills").value) || 0;
-    const place = parseInt(tr.querySelector(".place").value) || 0;
-
-    const total = (kills * parseInt(pointsPerKill.value)) + place;
-    tr.querySelector(".total").textContent = total;
+    const wins = parseInt(tr.querySelector(".wins").value)||0;
+    const kills = parseInt(tr.querySelector(".kills").value)||0;
+    const place = parseInt(tr.querySelector(".place").value)||0;
+    const ppk = parseInt(pointsPerKill.value)||0;
+    tr.querySelector(".total").textContent = (kills*ppk)+place;
   });
 }
 
+document.getElementById("resetBtn").addEventListener("click", () => {
+  document.getElementById("scoreboardTitle").value="";
+  document.getElementById("scoreboardSubtitle").value="";
+  document.getElementById("scoreboardSubtitle2").value="";
+  document.getElementById("pointsPerKill").value=2;
+  document.getElementById("defaultImageInput").value="";
+  tbody.innerHTML="";
+  defaultTeamImage="";
+  updateTeamCount();
+  alert("Scoreboard reset!");
+});
 
- document.getElementById("resetBtn").addEventListener("click", () => {
-      document.getElementById("scoreboardTitle").value = "";
-      document.getElementById("scoreboardSubtitle").value = "";
-      document.getElementById("scoreboardSubtitle2").value = "";
-      document.getElementById("pointsPerKill").value = 2;
-      document.getElementById("defaultImageInput").value = "";
-      tbody.innerHTML = "";
-      defaultTeamImage = "";
-      alert("Scoreboard reset successfully!");
-    });
+document.getElementById("generateReadOnly").addEventListener("click", () => {
+  const title = escapeHtml(document.getElementById("scoreboardTitle").value).replace(/\n/g,"<br>");
+  const subtitle = escapeHtml(document.getElementById("scoreboardSubtitle").value.trim());
+  const subtitle2 = escapeHtml(document.getElementById("scoreboardSubtitle2").value.trim());
+  const ppk = parseInt(pointsPerKill.value)||0;
 
-    document.getElementById("generateReadOnly").addEventListener("click", () => {
-      const title = document.getElementById("scoreboardTitle").value.trim() || "Read Only Scoreboard";
-      const subtitle = document.getElementById("scoreboardSubtitle").value.trim();
-      const subtitle2 = document.getElementById("scoreboardSubtitle2").value.trim();
+  const rows = [...tbody.rows].map(tr => {
+    const name = tr.querySelector(".team-name").value.trim() || "Unnamed Team";
+    const wins = parseInt(tr.querySelector(".wins").value)||0;
+    const kills = parseInt(tr.querySelector(".kills").value)||0;
+    const place = parseInt(tr.querySelector(".place").value)||0;
+    const total = parseInt(tr.querySelector(".total").textContent)||0;
+    const img = tr.querySelector("img") ? tr.querySelector("img").src : (defaultTeamImage || "");
+    return {name,wins,kills,place,total,img};
+  });
 
-      const rows = [...tbody.rows].map(tr => {
-        const name = tr.querySelector(".team-name").value.trim() || "Unnamed Team";
-        const wins = parseInt(tr.querySelector(".wins").value) || 0;
-        const kills = parseInt(tr.querySelector(".kills").value) || 0;
-        const place = parseInt(tr.querySelector(".place").value) || 0;
-        const total = parseInt(tr.querySelector(".total").textContent) || 0;
-        let img = tr.querySelector("img") ? tr.querySelector("img").src : "";
-        if (!img && defaultTeamImage) img = defaultTeamImage;
-        return { name, wins, kills, place, total, img };
-      });
+  rows.sort((a,b)=>b.total-a.total);
 
-      rows.sort((a, b) => b.total - a.total);
-      const tableRows = rows.map(r => `
-        <tr>
-          <td><div class="cell-content team-cell">
-            ${r.img ? `<img src="${r.img}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">` : ""}
-            <span>${escapeHtml(r.name)}</span>
-          </div></td>
-          <td><div class="cell-content">${r.wins}</div></td>
-          <td><div class="cell-content">${r.kills}</div></td>
-          <td><div class="cell-content">${r.place}</div></td>
-          <td><div class="cell-content">${r.total}</div></td>
-        </tr>
+  const rowsHtml = rows.map((r,i)=>`
+    <div class="row">
+      <div class="num"><span>#${i+1}</span></div>
+      <div class="squad">
+        ${r.img ? `<img src="${r.img}" style="width:50px;height:50px;margin-right:10px;border-radius:6px;" />` : ""}
+        <span>${escapeHtml(r.name)}</span>
+      </div>
+      <div class="stat"><span>${r.wins}</span></div>
+      <div class="stat"><span>${r.place}</span></div>
+      <div class="stat"><span>${r.kills*ppk}</span></div>
+      <div class="stat"><span>${r.total}</span></div>
+    </div>
   `).join("");
 
-      const newDoc = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${escapeHtml(title)}</title>
-          <style>
-            body { background:#0f1220; color:white; font-family:sans-serif; padding:20px; }
-            table { border-collapse: seperate; margin: 0 auto; table-layout: fixed; border-spacing: 10px 2px;}
+  const newDoc = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${title}</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;500;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1020;
+  --accent: #ff154f;
+  --accent-dark: #d20f48;
+  --white: #ffffff;
+  --muted: #c7c7c7;
+  --card-bg: #1c1c28;
+  --row-bg: #1a1a22;
+  --gap: 30px;
+  --row-height: 70px;
+}
 
-           td, th {
-            border: 1px solid #444;
-            height: 40px;
-            padding: 8px;
-            text-align: center;
-            transform: skew(-15deg);
-            border-radius: 4px;   /* rounded corners */
-            overflow: hidden;      /* clips border correctly */
-            background: #1f2235;   /* optional, for contrast */
-           
+* {
+  box-sizing: border-box;
 }
-         td .cell-content, th .cell-content {
-           display: inline-block;
-           padding: 8px 12px;        
-           transform: skew(15deg);   
-           white-space: nowrap;
-}
-         td .cell-content img {
-          width: 40px;
-          height: 40px;
-          object-fit: cover;
-          border-radius: 8px;
-          margin-right: 5px;
-          vertical-align: middle;
-}
-       .team-cell {
-         display: flex;              /* row layout */
-         align-items: center;        /* vertically center */
-         justify-content: flex-start;/* push content to left */
-         gap: 10px;                  /* space between image and text */
-         text-align: left;           /* important: prevent centering */
-}
-      .team-cell span {
-         display: inline-block;
-}
-      .team-cell img {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 8px;
-}
-       th { background:#7E1CFF; }
-       img { border-radius:8px; }
 
-      .title-box {
-            display: flex;
-            flex-direction: column;
-            align-items: ;
-            gap: 6px;
-            background: linear-gradient(90deg, #7E1CFF 0%, #200ffa 100%);
-            padding: 10px 15px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;     /* optional max size */
-            min-width: 400px;
-            transform: skew(-15deg);
-            margin: 10px auto 14px auto;
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Montserrat, system-ui, -apple-system, "Segoe UI", Roboto;
+  background: var(--bg);
+  color: var(--white);
 }
-         
-         .title-box h2 {
-            margin: 0;
-            font-size: 2rem;
-            color: #FFFF00;
-            text-align: center;
-            transform: skew(15deg);
+
+/* Wrapper */
+.wrapper {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 26px 30px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
-         .title-box h3 {
-           margin: 0;
-           font-size: 1rem;
-           color: rgba(2,16,34,0.9);
-           text-align: right;
-           margin-right: 50px;
-          transform: skew(15deg);
-        
+
+/* Header */
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 22px;
 }
-          th:nth-child(1) { width:200px; } 
-            th:nth-child(2) { width:120px; }  
-            th:nth-child(3) { width:120px; }   
-            th:nth-child(4) { width:120px; }   
-            th:nth-child(5) { width:150px; }
 
-          td:nth-child(1) { 
-            background: red; 
-            color: white;
-            width:200px; 
-            text-align: left;
-            padding-left: 10px; 
-          }
-          td:nth-child(2) { 
-           background: white; 
-           color: black;
-           width:120px; 
-          }
-          td:nth-child(3) { 
-           background: red; 
-           color: white;
-           width:120px; 
-          }
-         td:nth-child(4) { 
-          background: white; 
-          color: black; 
-          width:120px;
-          }
-         td:nth-child(5) {
-          background: red; 
-          color: white;
-          width:150px;
-          }
+.left-head h1 {
+  font-family: Anton, Oswald, sans-serif;
+  font-size: 72px;
+  line-height: 0.9;
+  margin: 0;
+  color: var(--accent);
+  text-transform: uppercase;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.7);
+}
 
-        .team-cell {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; /* push items to left */
-                        text-align: left;
-    }
+.right-head h2 {
+  font-family: Anton, Oswald, sans-serif;
+  font-size: 56px;
+  margin: 0;
+  color: #fff;
+  text-align: right;
+}
 
-          </style>
-        </head>
-        <body>
-          <div class="title-box">
-            <h2>${escapeHtml(title)}</h2>
-            <h3>${escapeHtml(subtitle)}</h3>
-            <h3>${escapeHtml(subtitle2)}</h3>
-          </div>
-         
-          <table>
-            <tr>
-              <th><div class="cell-content">Team</div></th>
-              <th><div class="cell-content">Wins</div></th>
-              <th><div class="cell-content">Kills</div></th>
-              <th><div class="cell-content">Placement</div></th>
-              <th><div class="cell-content">Total</div></th>
-            </tr>
-            ${tableRows}
-          </table>
-        </body>
-        </html>
-      `;
+.right-head .sub {
+  color: var(--accent);
+  font-family: Oswald;
+  font-weight: 700;
+  font-size: 30px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  letter-spacing: 2px;
+  text-align: right;
+}
 
-      const w = window.open("", "_blank");
-      if (!w) {
-        alert("Popup blocked. Please allow popups for this site.");
-        return;
-      }
-      w.document.open();
-      w.document.write(newDoc);
-      w.document.close();
+/* Table */
+.table {
+  width: 100%;
+  margin-top: 18px;
+}
 
-      function escapeHtml(s){
-        return (s+"")
-          .replace(/&/g,"&amp;")
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;")
-          .replace(/'/g,"&#39;");
-      }
-    });
-  </script>
+/* Table header */
+.thead {
+  display: grid;
+  grid-template-columns: 100px 400px 150px 150px 150px 150px;
+  gap: var(--gap);
+  align-items: center;
+}
+
+.thead .cell {
+  background: var(--card-bg);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  height: 50px;
+  border: 2px solid var(--accent);
+  transform: translateX(15px);
+}
+
+/* Rows container */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+/* Individual row */
+.row {
+  display: grid;
+  grid-template-columns: 100px 400px 150px 150px 150px 150px;
+  align-items: center;
+  gap: var(--gap);
+}
+
+/* Number cell */
+.num {
+  background: var(--row-bg);
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transform: skewX(-30deg);
+  height: 60px;
+}
+
+.num span {
+  transform: skewX(30deg);
+  display: inline-block;
+}
+
+/* Squad cell */
+.squad {
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transform: skewX(-30deg);
+  height: var(--row-height);
+}
+
+.squad img {
+  margin-right: 10px;
+  border-radius: 6px;
+  transform: skewx(30deg); /* FIXED: images no longer skewed */
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.squad span {
+  transform: skewX(30deg);
+  display: inline-block;
+  font-family: Anton, Oswald, sans-serif;
+  font-size: 26px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+/* Stats cell */
+.stat {
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  font-weight: 800;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: skewX(-30deg);
+  height: var(--row-height);
+}
+
+.stat span {
+  transform: skewX(30deg);
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="top">
+    <div class="left-head"><h1>${title}</h1></div>
+    <div class="right-head">
+      <h2>${subtitle}</h2>
+      <div class="sub">${subtitle2}</div>
+    </div>
+  </div>
+  <div class="table">
+    <div class="thead">
+      <div class="cell">#</div>
+      <div class="cell">Squad Name</div>
+      <div class="cell">WINS</div>
+      <div class="cell">Place Pts</div>
+      <div class="cell">Kill Pts</div>
+      <div class="cell">Total Pts.</div>
+    </div>
+    <div class="rows">${rowsHtml}</div>
+  </div>
+</div>
 </body>
 </html>
+`;
 
-
-
+  const w = window.open("", "_blank");
+  if(!w){ alert("Popup blocked!"); return; }
+  w.document.open();
+  w.document.write(newDoc);
+  w.document.close();
+});
+</script>
+</body>
+</html>
